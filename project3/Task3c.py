@@ -8,6 +8,7 @@ import tqdm as tqdm
 # The Neural Network doesn't use Forward Euler
 # Therefore it doens't need to follow the stability criteria
 
+# Convert the values the trial solution is evaluated at to a tensor.
 dx = 0.1
 x_np = np.linspace(0,1,int(1.0/dx))
 
@@ -27,30 +28,37 @@ t = tf.reshape(tf.convert_to_tensor(t),shape=(-1,1))
 
 points = tf.concat([x,t],1)
 
-num_iter = 100000
-num_hidden_neurons = [90]
+# Define the number of neurons at each hidden layer
+num_iter = 10000 # 10^6 gives 0.0029 absolute error, but takes like 20 min
+num_hidden_neurons = [90] # Decides also the number of hidden layers
 
 X = tf.convert_to_tensor(X)
 T = tf.convert_to_tensor(T)
 
 
+# Construct the network.
+# tf.name_scope is used to group each step in the construction,
+# just for a more organized visualization in TensorBoard
 with tf.variable_scope('dnn'):
     num_hidden_layers = np.size(num_hidden_neurons)
 
+# Input layer
     previous_layer = points
 
+# Hidden layers
     for l in range(num_hidden_layers):
         current_layer = tf.layers.dense(previous_layer, num_hidden_neurons[l],activation=tf.nn.sigmoid)
         previous_layer = current_layer
 
+# Output layer
     dnn_output = tf.layers.dense(previous_layer, 1)
 
 
-## Define the trial solution and cost function
+## Define the trial solution
 def u(x):
     return tf.sin(np.pi*x)
 
-
+# Define the cost function
 with tf.name_scope('loss'):
     g_trial = (1 - t)*u(x) + x*(1-x)*t*dnn_output
 
@@ -59,32 +67,45 @@ with tf.name_scope('loss'):
 
     loss = tf.losses.mean_squared_error(zeros, g_trial_dt[0] - g_trial_d2x[0])
 
-learning_rate = 0.01
+# Choose the method to minimize the cost function, along with a learning rate
+learning_rate = 1e-2
 with tf.name_scope('train'):
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
-    traning_op = optimizer.minimize(loss)
+    #optimizer = tf.train.GradientDescentOptimizer(learning_rate) # Normal Gradient Descent
+    optimizer = tf.train.AdamOptimizer(learning_rate) # ADAM Gradient Descent
+    training_op = optimizer.minimize(loss)
 
+# Define a node that initializes all of the other nodes in the computational graph
+# used by TensorFlow:
 init = tf.global_variables_initializer()
 
 g_analytic = tf.exp(-np.pi**2*t)*tf.sin(np.pi*x)
 g_dnn = None
 
 ## The execution phase
+# Start a session where the graph defined from the construction phase can be evaluated at:
 with tf.Session() as sess:
+    # Initialize the whole graph
     init.run()
+
+    # The training of the network:
     for i in tqdm.tqdm(range(num_iter)):
-        sess.run(traning_op)
+        sess.run(training_op)
 
         # If one desires to see how the cost function behaves during training
         #if i % 100 == 0:
         #    print(loss.eval())
 
+
+ # Evaluate the analytical function to compare with
     g_analytic = g_analytic.eval()
+
+    # Store the result
     g_dnn = g_trial.eval()
 
 
-## Compare with the analutical solution
+## Compare with the analytical solution
 diff = np.abs(g_analytic - g_dnn)
+print("\n")
 print('Max absolute difference between analytical solution and TensorFlow DNN = ',np.max(diff))
 
 G_analytic = g_analytic.reshape((int(1.0/dt),int(1.0/dx)))
@@ -100,22 +121,22 @@ fig = plt.figure(figsize=(10,10))
 ax = fig.gca(projection='3d')
 ax.set_title('Solution from the deep neural network w/ %d layer'%len(num_hidden_neurons))
 s = ax.plot_surface(X,T,G_dnn,linewidth=0,antialiased=False,cmap=cm.viridis)
-ax.set_xlabel('Time $t$')
-ax.set_ylabel('Position $x$');
+ax.set_ylabel('Time $t$')
+ax.set_xlabel('Position $x$');
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.gca(projection='3d')
 ax.set_title('Analytical solution')
 s = ax.plot_surface(X,T,G_analytic,linewidth=0,antialiased=False,cmap=cm.viridis)
-ax.set_xlabel('Time $t$')
-ax.set_ylabel('Position $x$');
+ax.set_ylabel('Time $t$')
+ax.set_xlabel('Position $x$');
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.gca(projection='3d')
 ax.set_title('Difference')
 s = ax.plot_surface(X,T,diff,linewidth=0,antialiased=False,cmap=cm.viridis)
-ax.set_xlabel('Time $t$')
-ax.set_ylabel('Position $x$');
+ax.set_ylabel('Time $t$')
+ax.set_xlabel('Position $x$');
 
 
 # I think the plots for the 2D is wrong, maybe because of wrong slicing below
