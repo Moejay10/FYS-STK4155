@@ -1,7 +1,7 @@
 # FYS-STK4155 - Data Analysis and Machine Learning
 This is the public repository for the master-subject FYS-STK4155 at the University of Oslo. The course introduces a variety of central algorithms and methods essential for studies of data analysis and machine learning. The subject consists of three main projects, where you will find more information resting within each repository.
 
-It is the product of the collaboration between Jens Bratten Due, Oliver Lerstøl Hebnes & Mohamed Ismail.
+This is the product of the collaboration between Jens Bratten Due, Oliver Lerstøl Hebnes & Mohamed Ismail.
 
 # Project 1
 
