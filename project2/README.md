@@ -1,16 +1,36 @@
-# FYS-STK4155
-This is the public repository for the master-subject FYS-STK4155 at the University of Oslo. It is the product of the collaboration between Mohamed Ismail, Jens Due and Oliver Hebnes. The subject consists of three main projects, where you will find more information resting within each repository. 
+# Neural network and logistic regression: Model of Franke's function and the Wisconsin breast cancer data.
+This project is divided into two parts. The first part is modeling Franke's function, while the second part is about classifying the breast cancer data. 
 
-# Project 1
-This project contains code, jupyter notebooks and a report that analyse three different regression type together with resampling method on two different data sets.
+## Code skeleton
+- functions
+  - functions.py (this is where all of the functions are)
+  - hiddenlayer.py
+  - neuralnetwork.py
+- plots
+  - classification
+    - .. (PDFs for the report) 
+  - regression
+    - .. (PDFs for the report)
+- report
+  - project1_report.pdf
+- main.py 
+- main_classification.ipynb
+- main_regression.ipynb
 
-# Project 2 
-## Neural network and logistic regression: Model of Franke's function and the Wisconsin breast cancer data.
+## Jupyter notebooks
+Since this project is divided into two parts, there are two jupyter notebooks which gives you an overview and our results (with a standard deviation and random samples that changes every run), and how we got them. The name of them are 
+- main_classification.ipynb. This file models the Wisconsin's breast cancer data.
+- main_regression.ipynb. This file models Franke's Function.
 
-This project is divided into two parts. The first part is modeling Franke's function, while the second part is about classifying the breast cancer data.
 
-# Project 3 
+## How to run the files 
+The required packages included to run the jupyter notebooks are 
+- numpy
+- matplotlib
+- sklearn
+- tqdm
+- jupyter notebook
+- seaborn
+- pandas
 
-## Solving partial differential equations & Eigenvalue Problems with neural networks
-
-This project is divided into two parts where the first part is about solving partial differential equations using Forward Euler, Backward Euler, Crank-Nicolsen and a Neural Network. The second part is about finding eigenvalues using a neural network.
+Fork this repository, enter the jupyter notebooks, and run all the cells in one run. You can also run main.py, where there is small summary of the jupyter notebooks. 
